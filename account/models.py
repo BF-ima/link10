@@ -277,18 +277,43 @@ class StartupProfile(models.Model):
 
 class Chat(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    bureau = models.ForeignKey(BureauEtude, on_delete=models.CASCADE, related_name='chats')
+
+    bureau = models.ForeignKey(BureauEtude, on_delete=models.CASCADE, related_name='chats', null=True, blank=True)
     startup = models.ForeignKey(Startup, on_delete=models.CASCADE, related_name='chats')
+    personne = models.ForeignKey(Personne, on_delete=models.CASCADE, related_name='chats', null=True, blank=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     last_message_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
 
     class Meta:
-        unique_together = ('bureau', 'startup')
+        constraints = [
+            models.CheckConstraint(
+                check=(
+                    models.Q(bureau__isnull=False, personne__isnull=True) |
+                    models.Q(bureau__isnull=True, personne__isnull=False)
+                ),
+                name="only_one_receiver"
+            ),
+            models.UniqueConstraint(
+                fields=['startup', 'bureau'],             # only one chat between two specific pair 
+                condition=models.Q(bureau__isnull=False),
+                name='unique_startup_bureau_chat'
+            ),
+            models.UniqueConstraint(
+                fields=['startup', 'personne'],
+                condition=models.Q(personne__isnull=False),
+                name='unique_startup_personne_chat'
+            ),
+        ]
 
     def __str__(self):
-        return f"Chat between {self.bureau.nom} and {self.startup.nom}"
+        if self.bureau:
+            return f"Chat between {self.startup.nom} and Bureau {self.bureau.nom}"
+        elif self.personne:
+            return f"Chat between {self.startup.nom} and Personne {self.personne.nom}"
+        return f"Chat for {self.startup.nom}"
 
 
 def message_file_path(instance, filename):
@@ -316,10 +341,12 @@ class Message(models.Model):
     # Type choices for the sender and receiver
     BUREAU = 'bureau'
     STARTUP = 'startup'
+    PERSONNE = 'personne'
     
     ENTITY_TYPE_CHOICES = [
         (BUREAU, 'Bureau d\'Étude'),
         (STARTUP, 'Startup'),
+        (PERSONNE, 'Personne'),
     ]
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

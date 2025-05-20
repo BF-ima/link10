@@ -161,7 +161,7 @@ class ChatSerializer(serializers.ModelSerializer):
     class Meta:
         model = Chat
         fields = [
-            'id', 'bureau', 'startup', 'created_at', 
+            'id', 'bureau', 'startup', 'personne', 'created_at', 
             'updated_at', 'last_message_at', 'is_active',
             'last_message', 'unread_count'
         ]
@@ -192,6 +192,9 @@ class ChatSerializer(serializers.ModelSerializer):
         elif hasattr(user, 'id_bureau'):
             entity_type = 'bureau'
             entity_id = user.id_bureau
+        elif hasattr(user, 'id_personne'):  
+            entity_type = 'personne'
+            entity_id = user.id_personne    
         else:
             return 0
         

@@ -136,18 +136,15 @@ STATIC_URL = 'static/'
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
-CORS_ALLOW_ALL_ORIGINS = True
-
-#REST_FRAMEWORK = {
- #   'DEFAULT_AUTHENTICATION_CLASSES': (
-  #  'rest_framework_simplejwt.authentication.JWTAuthentication',
-  #  )
-#}
+# Allow frontend access (dev only)
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",  # React dev server
+]
 
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'account.authentication.JWTAuthentication',  # Replace 'your_app' with your actual app name
+        'account.authentication.JWTAuthentication', 
     )
 }
 

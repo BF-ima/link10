@@ -1,5 +1,5 @@
 from django.urls import path, include
-from .views import PersonneListCreateView, StartupListCreateView, BureauEtudeListView, LoginAPIView, ChatViewSet, MessageViewSet, PersonneProfileViewSet, StartupProfileViewSet, BureauEtudeProfileViewSet, FeedbackViewSet
+from .views import PersonneListCreateView, StartupListCreateView, BureauEtudeListView, LoginAPIView, ChatViewSet, MessageViewSet, PersonneProfileViewSet, StartupProfileViewSet, BureauEtudeProfileViewSet, FeedbackViewSet, RefreshTokenView 
 from rest_framework.routers import DefaultRouter
 from rest_framework_nested import routers
 
@@ -23,6 +23,7 @@ chat_router.register(r'messages/(?P<message_id>[^/.]+)/mark_as_read', MessageVie
 
 urlpatterns = [
     path('login', LoginAPIView.as_view()),
+    path('refresh/', RefreshTokenView.as_view(), name='token_refresh'),
     path('personne/', PersonneListCreateView.as_view(), name='personne_list_create'),
     path('startup/', StartupListCreateView.as_view(), name='startup_list_create'),
     path('bureau/', BureauEtudeListView.as_view(), name='bureau_etude_list'),
