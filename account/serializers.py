@@ -6,8 +6,11 @@ from django.contrib.auth.hashers import make_password
 from django.contrib.auth import authenticate
 from django.contrib.auth.backends import ModelBackend
 from django.utils import timezone
-   
-    
+from .models import ConsultationType
+from .models import ConsultationRequest
+from .models import PaymentRequest
+
+
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True)
     password2 = serializers.CharField(write_only=True, required=True)
@@ -205,3 +208,53 @@ class ChatSerializer(serializers.ModelSerializer):
             is_read=False
         ).count()
 
+
+class StartupProfileUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = StartupProfile
+        fields = [
+            'logo', 'owner_name', 'phone', 'email', 'location',
+            'industry', 'description', 'website', 'date_creation',
+            'facebook', 'linkedin', 'whatsapp',
+            'leader_first_name', 'leader_last_name', 'leader_date_of_birth',
+            'leader_gender', 'leader_bio', 'leader_phone', 'leader_email',
+            'leader_location', 'leader_facebook', 'leader_linkedin', 'leader_whatsapp'
+        ]
+        extra_kwargs = {
+            'email': {'required': False},
+            'leader_email': {'required': False}
+        }
+
+
+class ConsultationTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ConsultationType
+        fields = '__all__'
+
+class ConsultationRequestSerializer(serializers.ModelSerializer):
+    bureau = BureauEtudeSerializer(read_only=True)
+    startup = StartupSerializer(read_only=True)
+    consultation_type = ConsultationTypeSerializer(read_only=True)
+    
+    class Meta:
+        model = ConsultationRequest
+        fields = '__all__'
+        read_only_fields = ('status', 'created_at', 'updated_at')
+
+class ConsultationRequestCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ConsultationRequest
+        fields = ('consultation_type', 'problem_description')
+        
+    def validate(self, data):
+        if not data.get('consultation_type'):
+            raise serializers.ValidationError("Consultation type is required")
+        if not data.get('problem_description'):
+            raise serializers.ValidationError("Problem description is required")
+        return data
+
+class PaymentRequestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PaymentRequest
+        fields = '__all__'
+        read_only_fields = ('is_paid', 'created_at')

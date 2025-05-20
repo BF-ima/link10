@@ -2,6 +2,13 @@ from django.urls import path, include
 from .views import PersonneListCreateView, StartupListCreateView, BureauEtudeListView, LoginAPIView, ChatViewSet, MessageViewSet, PersonneProfileViewSet, StartupProfileViewSet, BureauEtudeProfileViewSet, FeedbackViewSet, RefreshTokenView 
 from rest_framework.routers import DefaultRouter
 from rest_framework_nested import routers
+from .views import MemberSearchView, MemberManagementViewSet, BureauEtudeSearchView, BureauEtudeDetailView
+from .views import (
+    ConsultationTypeListView,
+    ConsultationRequestViewSet,
+    ConsultationRequestActionView,
+    PaymentRequestViewSet
+)
 
 
 
@@ -29,8 +36,17 @@ urlpatterns = [
     path('bureau/', BureauEtudeListView.as_view(), name='bureau_etude_list'),
     path('', include(router.urls)),
     path('', include(chat_router.urls)),
-    
-    ]
+    path('members/search/', MemberSearchView.as_view(), name='member-search'),
+    path('members/', include(router.urls)),  # For member management
+    path('bureau/search/', BureauEtudeSearchView.as_view(), name='bureau-search'),
+    path('bureau/<int:pk>/', BureauEtudeDetailView.as_view(), name='bureau-detail'),
+      path('consultation-types/', ConsultationTypeListView.as_view(), name='consultation-types'),
+    path('consultation-requests/<int:pk>/<str:action>/', ConsultationRequestActionView.as_view(), name='consultation-action'),
+  ]
 
+# Register the member management viewset
+router.register(r'members', MemberManagementViewSet, basename='member-management')   
+router.register(r'consultation-requests', ConsultationRequestViewSet, basename='consultation-request')
+router.register(r'payment-requests', PaymentRequestViewSet, basename='payment-request')
     
 

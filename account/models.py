@@ -396,3 +396,45 @@ class MessageAttachment(models.Model):
     def __str__(self):
         return f"Attachment for {self.message}" 
 
+
+class ConsultationType(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.TextField(blank=True)
+    
+    def __str__(self):
+        return self.name
+
+class ConsultationRequest(models.Model):
+    PENDING = 'pending'
+    ACCEPTED = 'accepted'
+    REJECTED = 'rejected'
+    COMPLETED = 'completed'
+    
+    STATUS_CHOICES = [
+        (PENDING, 'Pending'),
+        (ACCEPTED, 'Accepted'),
+        (REJECTED, 'Rejected'),
+        (COMPLETED, 'Completed'),
+    ]
+    
+    bureau = models.ForeignKey(BureauEtude, on_delete=models.CASCADE, related_name='consultation_requests')
+    startup = models.ForeignKey(Startup, on_delete=models.CASCADE, related_name='consultation_requests')
+    consultation_type = models.ForeignKey(ConsultationType, on_delete=models.SET_NULL, null=True)
+    problem_description = models.TextField()
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=PENDING)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return f"Consultation request from {self.startup.nom} to {self.bureau.nom}"
+
+class PaymentRequest(models.Model):
+    consultation = models.OneToOneField(ConsultationRequest, on_delete=models.CASCADE, related_name='payment_request')
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    payment_method = models.CharField(max_length=100, default='Baird Mob')
+    is_paid = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"Payment request for {self.consultation} - {self.amount} DA"
+    
