@@ -69,6 +69,7 @@ class Personne(AbstractBaseUser):
     date_naissance = models.DateField()
     titre_role = models.CharField(max_length=100)
     description_role = models.TextField()
+    startups = models.ManyToManyField('Startup', through='StartupMember', related_name='personne_startups') 
 
     USERNAME_FIELD = "email"
     objects = PersonneManager()
@@ -114,7 +115,7 @@ class Startup(AbstractBaseUser):
     description = models.TextField(verbose_name="Description")
     nom = models.CharField(max_length=255, verbose_name="Nom")
     is_active = models.BooleanField(default=True)
-    adresse = models.TextField(verbose_name="Adresse")
+    adresse = models.TextField(verbose_name="Adresse", blank=True)
     wilaya = models.CharField(max_length=100, verbose_name="Wilaya")
     email = models.EmailField(unique=True, verbose_name="Email")
     numero_telephone = models.CharField(max_length=10, verbose_name="Numéro de téléphone")
@@ -125,7 +126,7 @@ class Startup(AbstractBaseUser):
     ]
     secteur = models.CharField(max_length=50, choices=TYPE_S, verbose_name="Secteur d'activité")
     # Added many-to-many relationship with Personne as members
-    members = models.ManyToManyField(Personne, through='StartupMember', related_name='member_of_startups')      
+    members = models.ManyToManyField(Personne, through='StartupMember', related_name='startup_members')      
 
     USERNAME_FIELD = "email"
     objects = StartupManager()
@@ -191,6 +192,8 @@ class PersonneProfile(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    startups = models.ManyToManyField('Startup', related_name='memberss')
+
     def __str__(self):
         return f"{self.first_name} {self.last_name} Profile"               
 
@@ -214,6 +217,8 @@ class BureauEtudeProfile(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    
 
     def __str__(self):
         return f"Profile of {self.bureau.nom}"
@@ -269,7 +274,7 @@ class StartupProfile(models.Model):
 
     #  memebers of the startup
 
-    members = models.ManyToManyField('Personne', related_name='startups')
+    members = models.ManyToManyField('Personne', related_name='startupss')
 
     def __str__(self):
         return f"Profile of {self.startup.name}"  
@@ -435,6 +440,6 @@ class PaymentRequest(models.Model):
     is_paid = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     
-    def __str__(self):
+    def __str__(self):git push -u origin main
         return f"Payment request for {self.consultation} - {self.amount} DA"
     

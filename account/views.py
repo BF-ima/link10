@@ -19,7 +19,6 @@ from .models import (
 )
 from .models import ConsultationType
 from .permissions import IsOwnerOrReadOnly, IsStartupOrPersonne
-<<<<<<< HEAD
 import jwt, datetime
 
 class RefreshTokenView(APIView):
@@ -40,8 +39,6 @@ class RefreshTokenView(APIView):
 
         return Response({'token': access_token})
 
-
-=======
 from .serializers import ConsultationTypeSerializer
 from .serializers import ConsultationRequestCreateSerializer
 from .serializers import ConsultationRequestSerializer
@@ -244,7 +241,7 @@ class MemberManagementViewSet(viewsets.ViewSet):
                 {'error': 'Member not found'},
                 status=status.HTTP_404_NOT_FOUND
             )
->>>>>>> 45df831b059dac94ebc4e7d9f56b0a17f77ec83e
+
 
 
 class FeedbackViewSet(viewsets.ModelViewSet):

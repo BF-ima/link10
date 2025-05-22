@@ -32,7 +32,11 @@ class RegisterSerializer(serializers.ModelSerializer):
        
     def create(self, validated_data):
         validated_data.pop('password2')  # Remove 'password2' since it's not part of the model
-        return Personne.objects.create_user(**validated_data)
+        personne = Personne.objects.create_user(**validated_data)  # ✅ Create the user first
+
+        PersonneProfile.objects.create(personne=personne)  # ✅ Now use the created instance
+
+        return personne
 
 
 class RegisterStartupSerializer(serializers.ModelSerializer):
@@ -54,7 +58,13 @@ class RegisterStartupSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data.pop('password2')
         validated_data['password'] = make_password(validated_data['password'])  # 🔹 Hash password
-        return Startup.objects.create(**validated_data)
+
+        
+        startup = Startup.objects.create(**validated_data)  # ✅ Create startup first
+
+        StartupProfile.objects.create(startup=startup)
+
+        return startup
 
 
 
